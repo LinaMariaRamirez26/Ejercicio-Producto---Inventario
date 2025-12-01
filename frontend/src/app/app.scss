@@ -1,0 +1,9 @@
+main { display: block; }
+.page { min-height: 100vh; display: flex; flex-direction: column; }
+.site-header { background: #fff; border-bottom: 1px solid var(--border); }
+.header-content { display: flex; align-items: center; justify-content: space-between; padding: .75rem 1rem; }
+.brand { text-decoration: none; color: var(--text); font-weight: 700; }
+.site-footer { background: #fff; border-top: 1px solid var(--border); }
+.footer-content { padding: .75rem 1rem; text-align: center; }
+.muted { color: var(--muted); font-size: .875rem; }
+.main { flex: 1; }

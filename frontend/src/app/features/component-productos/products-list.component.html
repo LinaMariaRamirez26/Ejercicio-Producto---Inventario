@@ -1,0 +1,28 @@
+<div class="container">
+  <h1 class="title">Productos</h1>
+
+  <div *ngIf="loading()" class="loading">Cargando…</div>
+
+  <div *ngIf="error()" class="alert">
+    <div>{{ error() }}</div>
+    <button class="btn" (click)="fetch()">Reintentar</button>
+  </div>
+
+  <ul *ngIf="!loading() && !error()" class="grid">
+    <li *ngFor="let p of pageItems()" class="card">
+      <div class="card-header">
+        <a class="link" [routerLink]="['/productos', p.id]">{{ p.nombre }}</a>
+      </div>
+      <div class="card-body">
+        <span class="price">$ {{ p.precio }}</span>
+        <span class="stock">Stock: {{ p.stock }}</span>
+      </div>
+    </li>
+  </ul>
+
+  <div class="pagination" *ngIf="!loading() && !error()">
+    <button class="btn icon" (click)="prev()" [disabled]="page() === 1">&laquo;</button>
+    <span class="page-pill">Página {{ page() }} de {{ totalPages() }}</span>
+    <button class="btn icon" (click)="next()" [disabled]="page() === totalPages()">&raquo;</button>
+  </div>
+</div>

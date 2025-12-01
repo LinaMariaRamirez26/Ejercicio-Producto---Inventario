@@ -1,0 +1,25 @@
+<div class="container" *ngIf="product() as p">
+  <h2 class="title">Detalle Inventario</h2>
+  <br/>
+  <div class="detail-card">
+    <div class="detail-header">
+      <h1 class="title">{{ p.nombre }}</h1>
+      <div class="badge">Cantidad Disponible: {{ stock()?.stock ?? p.stock }}</div>
+    </div>
+    <div class="detail-row">
+      <div class="price">Precio: $ {{ p.precio }}</div>
+    </div>
+    <div *ngIf="loading()" class="loading">Cargando…</div>
+    <div *ngIf="error()" class="alert">{{ error() }}</div>
+    <div *ngIf="!error() && success()" class="alert success">{{ success() }}</div>
+    <div class="actions">
+      <label class="label">Cantidad a comprar</label>
+      <input class="input" type="number" min="1" [value]="cantidad()" (input)="onCantidad($event)" />
+      <button class="btn primary" (click)="comprar()" [disabled]="loading() || cantidad() < 1 || cantidad() > disponible()">Comprar</button>
+    </div>
+    <div *ngIf="cantidad() > disponible()" class="hint">La cantidad excede el stock disponible</div>
+    <div class="footer">
+      <a class="btn secondary" [routerLink]="['/productos']">&#8592; Volver</a>
+    </div>
+  </div>
+</div>
