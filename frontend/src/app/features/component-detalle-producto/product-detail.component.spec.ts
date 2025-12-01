@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { ProductDetailComponent } from '../product-detail.component';
+import { ProductDetailComponent } from './product-detail.component';
 import { ProductsService } from '../../api/productos.service';
 import { InventoryService } from '../../api/inventario.service';
 import { ActivatedRoute } from '@angular/router';
@@ -19,7 +19,7 @@ describe('ProductDetailComponent', () => {
       imports: [ProductDetailComponent],
       providers: [
         { provide: ProductsService, useValue: services.products ?? { getById: () => of(product) } },
-        { provide: InventoryService, useValue: services.inventory ?? { getStock: () => of(stock), purchase: vi.fn(() => of({ productId: 1, cantidad: 4 })) } },
+        { provide: InventoryService, useValue: services.inventory ?? { getStock: () => of(stock), compra: vi.fn(() => of({ productId: 1, cantidad: 4 })) } },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map([['id', '1']]) } } },
       ],
     });
@@ -33,13 +33,14 @@ describe('ProductDetailComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('.title')?.textContent).toContain('Televisor');
-    expect(el.querySelector('.badge')?.textContent).toContain('Stock: 5');
+    expect(el.querySelector('.detail-header .title')?.textContent).toContain('Televisor');
+    expect(el.querySelector('.badge')?.textContent).toContain('Cantidad Disponible');
+    expect(el.querySelector('.badge')?.textContent).toContain('5');
   });
 
   it('compra exitosa actualiza stock y muestra éxito', async () => {
-    const purchase = vi.fn(() => of({ productId: 1, cantidad: 4 }));
-    const fixture = setup({ inventory: { getStock: () => of(stock), purchase } });
+    const compra = vi.fn(() => of({ productId: 1, cantidad: 4 }));
+    const fixture = setup({ inventory: { getStock: () => of(stock), compra } });
     await fixture.whenStable();
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
@@ -47,28 +48,29 @@ describe('ProductDetailComponent', () => {
     btn.click();
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(el.querySelector('.badge')?.textContent).toContain('Stock: 4');
+    expect(el.querySelector('.badge')?.textContent).toContain('Cantidad Disponible');
+    expect(el.querySelector('.badge')?.textContent).toContain('4');
     expect(el.querySelector('.alert.success')?.textContent).toContain('Compra realizada');
-    expect(purchase).toHaveBeenCalled();
+    expect(compra).toHaveBeenCalled();
   });
 
   it('bloquea compra si cantidad es menor a 1', async () => {
-    const purchase = vi.fn(() => of({ productId: 1, cantidad: 4 }));
-    const fixture = setup({ inventory: { getStock: () => of(stock), purchase } });
+    const compra = vi.fn(() => of({ productId: 1, cantidad: 4 }));
+    const fixture = setup({ inventory: { getStock: () => of(stock), compra } });
     await fixture.whenStable();
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
-    const cmp = fixture.componentInstance;
+    const cmp: ProductDetailComponent = fixture.componentInstance;
     cmp.cantidad.set(0);
     fixture.detectChanges();
     const btn = el.querySelector('.btn.primary') as HTMLButtonElement;
     expect(btn.disabled).toBe(true);
-    expect(purchase).not.toHaveBeenCalled();
+    expect(compra).not.toHaveBeenCalled();
   });
 
   it('muestra error del backend al comprar', async () => {
-    const purchase = vi.fn(() => throwError(() => ({ error: { errors: [{ detail: 'Stock insuficiente' }] } })));
-    const fixture = setup({ inventory: { getStock: () => of(stock), purchase } });
+    const compra = vi.fn(() => throwError(() => ({ error: { errors: [{ detail: 'Stock insuficiente' }] } })));
+    const fixture = setup({ inventory: { getStock: () => of(stock), compra } });
     await fixture.whenStable();
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
